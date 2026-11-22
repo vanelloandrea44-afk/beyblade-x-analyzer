@@ -114,6 +114,32 @@ META_BLADES = {
     "Draciel": (4, "C", "Remake X-Over da collezione.")
 }
 
+# Profilo fisico/geometrico delle Blade: (forma_label, bonus_att, bonus_def, bonus_sta, desc_forma)
+BLADE_SHAPES = {
+    "Wizard Rod": ("Circolare OWD", 0, 1, 3, "Massa perimetrale continua (OWD): massima inerzia rotazionale."),
+    "Clock Mirage": ("Circolare Stamina", 0, 1, 3, "Profilo tondo a basso attrito aerodinamico."),
+    "Silver Wolf": ("Circolare Free-Spin", 0, 2, 3, "Anello esterno rotante che dissipa gli urti tangenziali."),
+    "Phoenix Wing": ("Smash Aerodinamico", 3, 1, 0, "3 lame pesanti inclinate per colpi d'urto ad alta energia."),
+    "Aero Pegasus": ("Compatta Bilanciata", 3, 1, 1, "Geometria compatta ad altissima densità per Xtreme Dash."),
+    "Shark Edge": ("Upper Sloped", 3, 0, 0, "Lame inclinate verso l'alto per sollevare e mandare KO l'avversario."),
+    "Shark Scale": ("Upper Ribassato", 3, 0, 0, "Profilo a cuneo basso progettato per colpire sotto i Ratchet."),
+    "Dran Buster": ("Lama Singola Impatto", 4, 0, -1, "Concentrazione asimmetrica della massa per colpo singolo KO."),
+    "Impact Drake": ("Lame Gomma Rinculo", 3, 1, -1, "Inserti in gomma ad alto attrito: massimo rinculo in impatto."),
+    "Tyranno Beat": ("Smash Spesso", 2, 2, 0, "Lame spesse multi-impatto con ottima tenuta alle collisioni."),
+    "Scorpio Spear": ("Baricentro Basso", 1, 2, 2, "Profilo largo e ribassato ad altissima stabilità."),
+    "Cobalt Dragoon": ("Lame Left-Spin", 2, 0, 2, "Geometria sinistrorsa ottimizzata per Spin-Equalization."),
+    "Meteor Dragoon": ("Lame Left-Spin Pesanti", 3, 0, 1, "Profilo sinistrorso massiccio per contrattacco e ruba-rotazione."),
+    "Knight Mail": ("Parete Assorbi-Urto", 0, 3, 1, "Scudo perimetrale chiuso con sfere interne anti-rinculo."),
+    "Leon Crest": ("Parete Difensiva Spessa", 0, 3, 0, "Muraglia spessa a 7 lati per respingere gli attacchi frontali."),
+    "Golem Rock": ("Compatta Bassa", 1, 3, 0, "Profilo basso e raccolto difficile da agganciare."),
+    "Whale Wave": ("Smash Verticale", 3, 1, 0, "Lame massicce che schiacciano l'avversario dall'alto."),
+    "Samurai Saber": ("Lame Mobili Taglio", 2, 0, 1, "Alette estensibili che aumentano il raggio d'impatto."),
+    "Hells Scythe": ("Bilanciata Circolare", 1, 1, 2, "Forma armonica versatile tra difesa perimetrale e stamina."),
+    "Unicorn Sting": ("Asimmetrica Ibrida", 1, 2, 1, "Metà liscia difensiva e metà dentata per contrattacco."),
+    "Ghost Circle": ("Circolare Ultra-Leggera", -1, -1, 1, "Forma tonda ma massa insufficiente per reggere urti pesanti."),
+    "Shinobi Shadow": ("Compatta Ultra-Leggera", -1, 0, 0, "Profilo stretto ma peso troppo ridotto in collisione.")
+}
+
 # Sovrascrive/aggiorna i Tier se meta_live.json è raggiungibile su GitHub
 if live_data and "meta_blades" in live_data:
     for b_key, val_list in live_data["meta_blades"].items():
@@ -165,6 +191,43 @@ META_RATCHETS = {
     "4-80": (3, "C", "Troppo alto ed esposto agli attacchi bassi.")
 }
 
+# ==============================================================================
+# FISICA E GEOMETRIA DELLE BLADE (Forma, OWD, Upper, Smash, Rinculo)
+# ==============================================================================
+BLADE_SHAPES = {
+    "Wizard Rod": ("Circolare OWD", 1, 10, 4, "Massa periferica (OWD) e profilo tondo continuo: massima inerzia rotazionale."),
+    "Clock Mirage": ("Circolare OWD", 1, 9, 4, "Circonferenza ampia ad altissima stamina, ma vulnerabile se colpita sotto."),
+    "Silver Wolf": ("Circolare Free-Spin", 2, 9, 7, "Anello esterno libero che dissipa gli urti e preserva la rotazione."),
+    "Phoenix Wing": ("Smash Aerodinamico", 9, 5, 5, "3 lame pesanti inclinate per sbalzare l'avversario fuori dall'arena."),
+    "Aero Pegasus": ("Smash Compatto", 9, 5, 6, "Profilo compatto ad altissima densità: trasferimento d'energia esplosivo."),
+    "Cobalt Dragoon": ("Lame Left-Spin", 8, 8, 5, "Lame destrorse/sinistrorse ottimizzate per agganciare e rubare spin (LAD)."),
+    "Meteor Dragoon": ("Lame Left-Spin", 8, 8, 6, "Massa pesante in rotazione sinistra con forte contraccolpo."),
+    "Shark Edge": ("Upper Ribassato", 9, 2, 3, "Lame scavate dal basso: progettata per infilarsi sotto il Ratchet e fare Burst/Over."),
+    "Shark Scale": ("Upper Ribassato", 10, 3, 4, "Evoluzione pesante e ultra-bassa: devasta i Ratchet esposti."),
+    "Dran Buster": ("One-Hit Eccentrico", 10, 1, 2, "Punta singola sbilanciata: massima potenza d'urto iniziale ma crollo di stamina."),
+    "Impact Drake": ("Lame Gomma / Rinculo", 10, 3, 4, "Inserti in gomma ad altissimo grip: genera rimbalzi violentissimi."),
+    "Tyranno Beat": ("Smash Pesante", 8, 5, 7, "Lame spesse a doppio impatto: eccelle negli scontri pesanti."),
+    "Scorpio Spear": ("Lancia Bilanciata", 7, 6, 7, "Baricentro basso e quasi 40g di peso per stabilità e contrattacco."),
+    "Whale Wave": ("Smash Verticale", 8, 4, 5, "Profilo alto che schiaccia verso il basso gli avversari."),
+    "Knight Mail": ("Parete Assorbi-Urto", 3, 6, 9, "Scudo perimetrale con sfere interne che smorzano i colpi."),
+    "Leon Crest": ("Parete Difensiva", 2, 4, 9, "Muro spesso a 7 lobi per bloccare gli attaccanti."),
+    "Golem Rock": ("Compatto Ribassato", 4, 5, 8, "Basso e compatto, devia i colpi rasoterra."),
+    "Tricera Press": ("Massa Difensiva", 4, 5, 8, "Profilo pesante progettato per assorbire l'impatto senza spostarsi."),
+    "Hells Scythe": ("Lame Bilanciate", 5, 7, 5, "Profilo classico versatile con buon equilibrio tra attacco e stamina."),
+    "Unicorn Sting": ("Asimmetrico Misto", 5, 6, 6, "Metà liscia per deviare e metà dentata per contrattaccare."),
+    "Samurai Saber": ("Lame Taglienti", 8, 5, 4, "Lame mobili che aumentano la velocità di taglio negli Xtreme Dash."),
+    "Dran Sword": ("Lame Agganciate", 7, 3, 4, "3 lame classiche per Xtreme Dash rapidi."),
+    "Dran Dagger": ("Multi-Lama", 7, 4, 4, "6 piccole lame per colpi ripetuti a raffica."),
+}
+
+
+def get_blade_shape(n: str):
+    n_norm = normalize_name(n)
+    for k, v in BLADE_SHAPES.items():
+        if normalize_name(k) in n_norm:
+            return v
+    return ("Profilo Standard", 5, 5, 5, "Geometria bilanciata standard.")
+
 
 # FIX: Riconoscimento intelligente dei nomi CamelCase del DB (es. "WizardRod" -> "Wizard Rod")
 def normalize_name(s: str) -> str:
@@ -179,6 +242,20 @@ def get_blade_meta(n: str):
     return (11, "B", "Blade standard senza vantaggi competitivi particolari.")
 
 
+def get_blade_shape(n: str, b_type: str):
+    n_norm = normalize_name(n)
+    for k, v in BLADE_SHAPES.items():
+        if normalize_name(k) in n_norm:
+            return v
+    defaults = {
+        "Attack": ("Lame Angolate Attack", 2, 0, 0, "Profilo spigoloso orientato all'impatto offensivo."),
+        "Defense": ("Scudo Perimetrale", 0, 2, 0, "Bordo chiuso progettato per deviare i colpi."),
+        "Stamina": ("Profilo Circolare", 0, 0, 2, "Geometria regolare per preservare la rotazione."),
+        "Balance": ("Profilo Ibrido", 1, 1, 1, "Geometria mista tra spinta e stabilità.")
+    }
+    return defaults.get(b_type, ("Standard", 0, 0, 0, "Geometria bilanciata standard."))
+
+
 def get_bit_meta(n: str):
     return META_BITS.get(n, (9, "B", "Bit standard."))
 
@@ -187,75 +264,25 @@ def get_ratchet_meta(n: str):
     return META_RATCHETS.get(n, (7, "B", "Ratchet standard."))
 
 
-def has_blade(blade_name: str, targets: list) -> bool:
-    bn = normalize_name(blade_name)
-    return any(normalize_name(t) in bn for t in targets)
-
-
-# ==============================================================================
-# GRAFICO RADAR SVG & CALCOLO STATISTICHE
-# ==============================================================================
-def radar_svg(stats: dict) -> str:
-    labels = ["Attacco", "Difesa", "Stamina", "Peso", "Anti-Burst"]
-    outer_pts = " ".join([
-        f"{140 + 85 * math.cos(math.radians(-90 + i * 72)):.1f},{130 + 85 * math.sin(math.radians(-90 + i * 72)):.1f}"
-        for i in range(5)
-    ])
-    inner_pts = " ".join([
-        f"{140 + (85 * max(1, min(10, stats[l])) / 10.0) * math.cos(math.radians(-90 + i * 72)):.1f},{130 + (85 * max(1, min(10, stats[l])) / 10.0) * math.sin(math.radians(-90 + i * 72)):.1f}"
-        for i, l in enumerate(labels)
-    ])
-    texts = "".join([
-        f'<text x="{140 + 109 * math.cos(math.radians(-90 + i * 72)):.1f}" y="{130 + 103 * math.sin(math.radians(-90 + i * 72)):.1f}" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">{l} ({stats[l]})</text>'
-        for i, l in enumerate(labels)
-    ])
-    return (
-        f'<svg width="290" height="260" viewBox="0 0 290 260">'
-        f'<polygon points="{outer_pts}" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>'
-        f'<polygon points="{inner_pts}" fill="rgba(56, 189, 248, 0.45)" stroke="#38bdf8" stroke-width="2.5"/>'
-        f'{texts}</svg>'
-    )
-
-
-def radar_1v1_svg(stats1: dict, stats2: dict) -> str:
-    labels = ["Attacco", "Difesa", "Stamina", "Peso", "Anti-Burst"]
-    outer_pts = " ".join([
-        f"{160 + 90 * math.cos(math.radians(-90 + i * 72)):.1f},{140 + 90 * math.sin(math.radians(-90 + i * 72)):.1f}"
-        for i in range(5)
-    ])
-    pts1 = " ".join([
-        f"{160 + (90 * max(1, min(10, stats1[l])) / 10.0) * math.cos(math.radians(-90 + i * 72)):.1f},{140 + (90 * max(1, min(10, stats1[l])) / 10.0) * math.sin(math.radians(-90 + i * 72)):.1f}"
-        for i, l in enumerate(labels)
-    ])
-    pts2 = " ".join([
-        f"{160 + (90 * max(1, min(10, stats2[l])) / 10.0) * math.cos(math.radians(-90 + i * 72)):.1f},{140 + (90 * max(1, min(10, stats2[l])) / 10.0) * math.sin(math.radians(-90 + i * 72)):.1f}"
-        for i, l in enumerate(labels)
-    ])
-    texts = "".join([
-        f'<text x="{160 + 118 * math.cos(math.radians(-90 + i * 72)):.1f}" y="{140 + 110 * math.sin(math.radians(-90 + i * 72)):.1f}" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">{l} ({stats1[l]} vs {stats2[l]})</text>'
-        for i, l in enumerate(labels)
-    ])
-    return (
-        f'<svg width="340" height="285" viewBox="0 0 340 285">'
-        f'<polygon points="{outer_pts}" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>'
-        f'<polygon points="{pts1}" fill="rgba(56, 189, 248, 0.38)" stroke="#38bdf8" stroke-width="2.5"/>'
-        f'<polygon points="{pts2}" fill="rgba(248, 113, 113, 0.38)" stroke="#f87171" stroke-width="2.5"/>'
-        f'{texts}</svg>'
-    )
-
-
-def calc_stats(b_name, b_type, bit_name, bit_type, w, burst_res, risk):
+def calc_stats(b_name, b_type, bit_name, bit_type, w, burst_res, risk, h=6.0):
     bm_pts = get_blade_meta(b_name)[0]
+    shape_name, sh_att, sh_sta, sh_def, _ = get_blade_shape(b_name)
     bonus_tier = 2 if bm_pts >= 20 else (1 if bm_pts >= 16 else 0)
 
-    att = max(1, min(10, (8 if b_type == "Attack" else (5 if b_type == "Balance" else 3)) + (2 if bit_type == "Attack" else (1 if bit_type == "Balance" else -1)) + (bonus_tier if b_type == "Attack" else 0)))
-    dfn = max(1, min(10, (8 if b_type == "Defense" else (5 if b_type == "Balance" else 3)) + (2 if bit_type == "Defense" else (1 if bit_type == "Balance" else -1)) + (bonus_tier if b_type == "Defense" else 0)))
+    # Bonus altezza per forme Upper (es. Shark Edge/Scale su assetti bassi <= 6.0mm)
+    upper_h_bonus = 1 if ("Upper" in shape_name and h <= 6.0) else 0
+
+    raw_att = ((8 if b_type == "Attack" else (5 if b_type == "Balance" else 3)) * 0.55) + (sh_att * 0.45) + (2 if bit_type == "Attack" else (1 if bit_type == "Balance" else -1)) + bonus_tier * 0.5 + upper_h_bonus
+    raw_dfn = ((8 if b_type == "Defense" else (5 if b_type == "Balance" else 3)) * 0.55) + (sh_def * 0.45) + (2 if bit_type == "Defense" else (1 if bit_type == "Balance" else -1)) + bonus_tier * 0.5
 
     if (has_blade(b_name, ["Wizard Rod"]) and bit_type == "Stamina") or (has_blade(b_name, ["Cobalt Dragoon", "Meteor Dragoon"]) and ("Elevate" in bit_name or "Level" in bit_name)):
         sta = 10
     else:
-        sta = max(1, min(10, (8 if b_type == "Stamina" else (5 if b_type == "Balance" else 3)) + (2 if bit_type == "Stamina" else (1 if bit_type == "Balance" else -1)) + (bonus_tier if b_type == "Stamina" else 0)))
+        raw_sta = ((8 if b_type == "Stamina" else (5 if b_type == "Balance" else 3)) * 0.5) + (sh_sta * 0.5) + (2 if bit_type == "Stamina" else (1 if bit_type == "Balance" else -1)) + bonus_tier * 0.5
+        sta = max(1, min(10, round(raw_sta)))
 
+    att = max(1, min(10, round(raw_att)))
+    dfn = max(1, min(10, round(raw_dfn)))
     peso_stat = max(1, min(10, round((w - 37.5) * 1.1)))
     ab_stat = max(1, min(10, (8 if burst_res == "High" else 4) + (2 if risk == "Very Low" else (1 if risk == "Low" else (-2 if "High" in risk else 0)))))
 
@@ -273,32 +300,51 @@ def valuta(blade, ratchet, bit):
     bm = get_blade_meta(blade["name"])
     bitm = get_bit_meta(bit["name"])
     rm = (12, "S+", "") if is_int else get_ratchet_meta(ratchet["name"])
+    shape_name, sh_att, sh_sta, sh_def, shape_desc = get_blade_shape(blade["name"])
 
     synergy_bonus = 0
-    pros = [f"Blade Tier {bm[1]}: {bm[2]}"]
+    pros = [
+        f"Blade Tier {bm[1]}: {bm[2]}",
+        f"Geometria [{shape_name}]: {shape_desc}"
+    ]
+
+    # Valutazione fisica del peso reale della Blade
+    if blade["weight_g"] >= 38.0:
+        synergy_bonus += 4
+        pros.append(f"Massa Pesante ({blade['weight_g']}g): elevata inerzia negli scontri fisici.")
+    elif blade["weight_g"] < 31.5:
+        synergy_bonus -= 6
+
+    # Sinergie Forma + Altezza
+    if "Upper" in shape_name and h <= 6.0:
+        synergy_bonus += 6
+        pros.append(f"Assetto Upper Ribassato ({h}mm): angolo ideale per colpire sotto i Ratchet.")
+    elif "Circolare" in shape_name and h <= 6.0 and risk in ["Low", "Very Low"]:
+        synergy_bonus += 4
+        pros.append(f"Profilo Circolare Compatto ({h}mm): minimizza i punti d'aggancio.")
 
     if has_blade(blade["name"], ["Wizard Rod"]) and bit["name"] in ["Ball (B)", "Free Ball (FB)", "Hexa (H)", "Orb (O)", "Low Orb (LO)"]:
-        synergy_bonus += 12
+        synergy_bonus += 10
         pros.append("COMBO META S+ (Top 1-3 Mondiale): Dominio assoluto sullo Spin Finish e controllo centro.")
     elif has_blade(blade["name"], ["Cobalt Dragoon", "Meteor Dragoon"]) and bit["name"] in ["Elevate (E)", "Level (L)", "Glide (G)"]:
-        synergy_bonus += 12
+        synergy_bonus += 10
         pros.append("COMBO META S+ (Spin-Equalizer): Sfrutta la rotazione sinistra per rubare energia.")
     elif has_blade(blade["name"], ["Phoenix Wing", "Aero Pegasus", "Shark Scale", "Tyranno Beat", "Impact Drake"]) and bit["name"] in ["Rush (R)", "Low Rush (LR)", "Point (P)", "Low Flat (LF)", "Flat (F)", "Level (L)"]:
-        synergy_bonus += 10
+        synergy_bonus += 8
         pros.append("COMBO META S+: Potenza d'urto e velocità al vertice competitivo.")
     elif has_blade(blade["name"], ["Silver Wolf"]) and bit["name"] in ["Free Ball (FB)", "Ball (B)", "Hexa (H)"]:
-        synergy_bonus += 10
+        synergy_bonus += 8
         pros.append("COMBO META S: L'anello free-spin assorbe i colpi massimizzando la stamina.")
 
     if blade["type"] == bit["type"]:
-        synergy_bonus += 6
+        synergy_bonus += 5
         pros.append(f"Sinergia di stile ({blade['type']}).")
     elif blade["weight_g"] >= 37.5 and bit["type"] in ["Stamina", "Defense"]:
-        synergy_bonus += 6
+        synergy_bonus += 5
         pros.append("Assetto Ibrido Pesante: la massa stabilizza la punta.")
 
     if not is_int and bit["burst_res"] == "Low" and risk == "Very Low":
-        synergy_bonus += 6
+        synergy_bonus += 5
         pros.append(f"Protezione Burst ottimale con {ratchet['name']}.")
 
     penalties = 0
@@ -307,14 +353,14 @@ def valuta(blade, ratchet, bit):
         penalties += 18
         cons.append(f"RISCHIO BURST ALTO: {bit['name']} + {ratchet['name']}.")
     if not is_int and h >= 8.0:
-        penalties += 8
-        cons.append(f"Baricentro alto ({h}mm): rischio sbilanciamento.")
+        penalties += 9
+        cons.append(f"Baricentro alto ({h}mm): espone il Ratchet agli attacchi bassi.")
     if w < 40.0:
-        penalties += 10
+        penalties += 12
         cons.append(f"Peso molto basso ({w}g): viene facilmente sbalzato.")
 
     score = max(0, min(100, 32 + bm[0] + bitm[0] + rm[0] + synergy_bonus - penalties))
-    return score, w, h, pros, cons, calc_stats(blade["name"], blade["type"], bit["name"], bit["type"], w, bit["burst_res"], risk)
+    return score, w, h, pros, cons, calc_stats(blade["name"], blade["type"], bit["name"], bit["type"], w, bit["burst_res"], risk, h)
 
 
 def valuta_ux_inf(u, bit):
@@ -327,7 +373,7 @@ def valuta_ux_inf(u, bit):
     if w >= 46.5:
         pros.append(f"Peso elevato ({w}g).")
     cons = [f"Baricentro alto ({h}mm)."] if h >= 8.0 else []
-    return score, w, h, pros, cons, calc_stats(u["name"], u["type"], bit["name"], bit["type"], w, bit.get("burst_res", "High"), "Very Low")
+    return score, w, h, pros, cons, calc_stats(u["name"], u["type"], bit["name"], bit["type"], w, bit.get("burst_res", "High"), "Very Low", h)
 
 
 def valuta_cx(lk, mb, ov, ab, r, bit, is_6):
@@ -351,7 +397,58 @@ def valuta_cx(lk, mb, ov, ab, r, bit, is_6):
     if not is_i and bit["burst_res"] == "Low" and risk in ["High", "Very High"]:
         cons.append(f"RISCHIO BURST ALTO: {bit['name']} + {r['name']}.")
 
-    return score, w, h, pros, cons, calc_stats(mb["name"], mb["type"], bit["name"], bit["type"], w, bit["burst_res"], risk)
+    return score, w, h, pros, cons, calc_stats(mb["name"], mb["type"], bit["name"], bit["type"], w, bit["burst_res"], risk, h)
+
+
+# ==============================================================================
+# MOTORE OUTCOME CALCULATOR 1VS1 (Xtreme / Over / Burst / Spin Finish)
+# ==============================================================================
+def calcola_outcomes_1v1(nome1, sc1, w1, h1, st1, tp1, nome2, sc2, w2, h2, st2, tp2):
+    sh1, sh_att1, sh_sta1, sh_def1, _ = get_blade_shape(nome1)
+    sh2, sh_att2, sh_sta2, sh_def2, _ = get_blade_shape(nome2)
+
+    # 1. XTREME FINISH (3 pt) - Guidato da Attacco, Peso, Forma Smash/Upper e Velocità
+    xt1 = max(2.0, (st1["Attacco"] ** 1.45) * 1.4 + (w1 - w2) * 1.6 + (sh_att1 * 1.1) - (st2["Difesa"] * 1.2) - (st2["Peso"] * 0.9))
+    xt2 = max(2.0, (st2["Attacco"] ** 1.45) * 1.4 + (w2 - w1) * 1.6 + (sh_att2 * 1.1) - (st1["Difesa"] * 1.2) - (st1["Peso"] * 0.9))
+
+    # 2. OVER FINISH (2 pt) - Spinta fuori dalle tasche laterali (Peso + Attacco + Altezza)
+    ov1 = max(3.0, (st1["Attacco"] * 2.1) + (w1 - w2) * 2.1 + (h2 - h1) * 1.8 - (st2["Difesa"] * 1.1))
+    ov2 = max(3.0, (st2["Attacco"] * 2.1) + (w2 - w1) * 2.1 + (h1 - h2) * 1.8 - (st1["Difesa"] * 1.1))
+
+    # 3. BURST FINISH (2 pt) - Attacco + Vantaggio Altezza (colpire sotto) vs Anti-Burst avversario
+    upper_adv1 = 10.0 if ("Upper" in sh1 and h1 < h2) else max(0.0, (h2 - h1) * 3.5)
+    upper_adv2 = 10.0 if ("Upper" in sh2 and h2 < h1) else max(0.0, (h1 - h2) * 3.5)
+    bu1 = max(1.5, (st1["Attacco"] * 1.8) + upper_adv1 + ((10 - st2["Anti-Burst"]) ** 1.55) * 1.9 - (st2["Anti-Burst"] * 0.8))
+    bu2 = max(1.5, (st2["Attacco"] * 1.8) + upper_adv2 + ((10 - st1["Anti-Burst"]) ** 1.55) * 1.9 - (st1["Anti-Burst"] * 0.8))
+
+    # 4. SPIN FINISH (1 pt) - Stamina, Forma OWD, Spin-Equalization (Left-Spin)
+    ls1 = 16.0 if ("Dragoon" in nome1 and "Dragoon" not in nome2 and ("Elevate" in nome1 or "Level" in nome1)) else 0.0
+    ls2 = 16.0 if ("Dragoon" in nome2 and "Dragoon" not in nome1 and ("Elevate" in nome2 or "Level" in nome2)) else 0.0
+    sp1 = max(3.0, (st1["Stamina"] ** 1.5) * 1.8 + (sh_sta1 * 1.3) + ls1 - (st2["Stamina"] * 1.1))
+    sp2 = max(3.0, (st2["Stamina"] ** 1.5) * 1.8 + (sh_sta2 * 1.3) + ls2 - (st1["Stamina"] * 1.1))
+
+    # Correzione in base al Voto Meta complessivo
+    f1 = 0.85 + (sc1 / 250.0)
+    f2 = 0.85 + (sc2 / 250.0)
+
+    raw = {
+        "p1_xt": xt1 * f1, "p1_ov": ov1 * f1, "p1_bu": bu1 * f1, "p1_sp": sp1 * f1,
+        "p2_xt": xt2 * f2, "p2_ov": ov2 * f2, "p2_bu": bu2 * f2, "p2_sp": sp2 * f2,
+    }
+    tot = sum(raw.values())
+    pct = {k: round((v / tot) * 100) for k, v in raw.items()}
+
+    # Aggiustamento arrotondamento per somma esatta 100%
+    diff = 100 - sum(pct.values())
+    max_k = max(pct, key=pct.get)
+    pct[max_k] += diff
+
+    prob1 = pct["p1_xt"] + pct["p1_ov"] + pct["p1_bu"] + pct["p1_sp"]
+    prob2 = 100 - prob1
+    ev1 = round((pct["p1_xt"] * 3 + pct["p1_ov"] * 2 + pct["p1_bu"] * 2 + pct["p1_sp"] * 1) / 100.0, 2)
+    ev2 = round((pct["p2_xt"] * 3 + pct["p2_ov"] * 2 + pct["p2_bu"] * 2 + pct["p2_sp"] * 1) / 100.0, 2)
+
+    return pct, prob1, prob2, ev1, ev2, (sh1, sh2)
 
 
 # ==============================================================================
@@ -428,83 +525,71 @@ def selettore_bey(cont, pref, lin, usa_col):
 
 
 # ==============================================================================
-# TAB 1: ANALIZZATORE & RADAR
-# ==============================================================================
-with t1:
-    solo_mia_col = st.checkbox("Filtra menu usando solo i pezzi della Mia Collezione", value=False)
-    linea = st.radio("Linea:", ["1. BX", "2. UX", "3. CX (5 Pezzi)", "4. BX Infinity", "5. UX Infinity", "6. CX Infinity (6 Pezzi)"], horizontal=True)
-    nome, sc, w, h, pros, cons, st_rad, pezzi_usati, _ = selettore_bey(t1, "t1", linea, solo_mia_col)
-
-    st.subheader(f"Combo: {nome}")
-    col_sx, col_dx = st.columns([1.4, 1])
-    m1, m2, m3 = col_sx.columns(3)
-    m1.metric("Voto Meta", f"{sc} / 100")
-    m2.metric("Peso", f"{w} g")
-    m3.metric("Altezza", f"{h} mm")
-
-    cp, cc = col_sx.columns(2)
-    cp.markdown("### ✅ Pro")
-    if pros:
-        for p in pros:
-            cp.success(p)
-    else:
-        cp.info("Bilanciata.")
-
-    cc.markdown("### ⚠️ Contro")
-    if cons:
-        for c in cons:
-            cc.error(c)
-    else:
-        cc.success("Nessun difetto grave!")
-
-    col_dx.markdown("### 📊 Radar Statistiche")
-    col_dx.markdown(radar_svg(st_rad), unsafe_allow_html=True)
-
-    if col_sx.button("➕ Aggiungi questa Combo al Deck Torneo"):
-        if len(st.session_state.deck) < 3:
-            st.session_state.deck.append({"nome": nome, "voto": sc, "peso": w, "pezzi": pezzi_usati})
-            st.rerun()
-        else:
-            col_sx.warning("Il Deck ha già 3 Beyblade! Vai nella scheda Deck Torneo per rimuoverne uno.")
-
-# ==============================================================================
-# TAB 2: SIMULATORE 1VS1
+# TAB 2: SIMULATORE 1VS1 & OUTCOME CALCULATOR
 # ==============================================================================
 with t2:
-    st.subheader("⚔️ Confronto Testa a Testa Universale (BX / UX / CX / Infinity)")
+    st.subheader("⚔️ Simulatore 1vs1 & Outcome Calculator (Xtreme / Over / Burst / Spin)")
     s1, s2 = st.columns(2)
     s1.markdown("### 🔵 Blader 1")
-    lin1 = s1.selectbox("Linea Blader 1:", ["1. BX", "2. UX", "3. CX (5 Pezzi)", "4. BX Infinity", "5. UX Infinity", "6. CX Infinity (6 Pezzi)"], index=1, key="lin1")
+    lin1 = s1.selectbox("Linea Blader 1:", ["1. BX", "2. UX", "3. CX (5 Pezzi)", "4. BX Infinity", "5. UX Infinity", "6. CX Infinity (6 Pezzi)"], index=0, key="lin1")
     nome1, sc1, w1, h1, _, _, st1, _, tp1 = selettore_bey(s1, "p1", lin1, False)
 
     s2.markdown("### 🔴 Blader 2")
-    lin2 = s2.selectbox("Linea Blader 2:", ["1. BX", "2. UX", "3. CX (5 Pezzi)", "4. BX Infinity", "5. UX Infinity", "6. CX Infinity (6 Pezzi)"], index=0, key="lin2")
+    lin2 = s2.selectbox("Linea Blader 2:", ["1. BX", "2. UX", "3. CX (5 Pezzi)", "4. BX Infinity", "5. UX Infinity", "6. CX Infinity (6 Pezzi)"], index=1, key="lin2")
     nome2, sc2, w2, h2, _, _, st2, _, tp2 = selettore_bey(s2, "p2", lin2, False)
 
-    p1_pts = (sc1 ** 1.35) + (w1 - w2) * 4.0 + (35 if ("Left-Spin" in nome1 and "Left-Spin" not in nome2 and ("Elevate" in nome1 or "Level" in nome1)) else 0) + (25 if (tp1 == "Attack" and tp2 == "Stamina") or (tp1 == "Stamina" and tp2 == "Defense") or (tp1 == "Defense" and tp2 == "Attack") else 0)
-    p2_pts = (sc2 ** 1.35) + (w2 - w1) * 4.0 + (35 if ("Left-Spin" in nome2 and "Left-Spin" not in nome1 and ("Elevate" in nome2 or "Level" in nome2)) else 0) + (25 if (tp2 == "Attack" and tp1 == "Stamina") or (tp2 == "Stamina" and tp1 == "Defense") or (tp2 == "Defense" and tp1 == "Attack") else 0)
-
-    prob1 = max(8, min(92, round((p1_pts / max(1, p1_pts + p2_pts)) * 100)))
-    prob2 = 100 - prob1
+    pct, prob1, prob2, ev1, ev2, (sh1, sh2) = calcola_outcomes_1v1(nome1, sc1, w1, h1, st1, tp1, nome2, sc2, w2, h2, st2, tp2)
 
     st.divider()
     res_c1, res_c2, res_c3 = st.columns(3)
-    res_c1.metric(f"🔵 {nome1}", f"{prob1}% Vittoria", f"{w1}g | Voto Meta {sc1}")
-    res_c2.metric("Differenza Peso", f"{round(abs(w1 - w2), 2)} g", f"Vantaggio {'Blader 1' if w1 >= w2 else 'Blader 2'}")
-    res_c3.metric(f"🔴 {nome2}", f"{prob2}% Vittoria", f"{w2}g | Voto Meta {sc2}")
+    res_c1.metric(f"🔵 {nome1}", f"{prob1}% Vittoria Totale", f"{w1}g | Alt: {h1}mm | {sh1}")
+    res_c2.metric("Confronto Fisico (Peso / Alt.)", f"Δ {round(abs(w1 - w2), 2)} g | Δ {round(abs(h1 - h2), 1)} mm", f"Punti Attesi/Round: {ev1} vs {ev2}")
+    res_c3.metric(f"🔴 {nome2}", f"{prob2}% Vittoria Totale", f"{w2}g | Alt: {h2}mm | {sh2}")
 
-    win_n, win_st, lose_h, lose_st = (nome1, st1, h2, st2) if prob1 >= prob2 else (nome2, st2, h1, st1)
-    if win_st["Stamina"] >= 9:
-        cond_win = "Spin Finish (1 pt) per resistenza e OWD superiore"
-    elif win_st["Attacco"] >= 8:
-        cond_win = "Xtreme / Over Finish (2-3 pt) per impatto pesante"
-    elif lose_h >= 7.5 or lose_st["Anti-Burst"] <= 4:
-        cond_win = "Burst Finish (2 pt) su Ratchet esposto"
-    else:
-        cond_win = "Spin Finish (1 pt) per controllo del centro"
+    st.markdown("### 🎯 Outcome Calculator — Probabilità per Tipo di Finale")
+    oc1, oc2 = st.columns(2)
 
+    with oc1:
+        st.markdown(f"#### 🔵 Esiti Vittoria: {nome1} ({prob1}%)")
+        st.write(f"⚡ **Xtreme Finish (3 pt):** `{pct['p1_xt']}%`")
+        st.progress(min(100, pct["p1_xt"]))
+        st.write(f"🚀 **Over Finish (2 pt):** `{pct['p1_ov']}%`")
+        st.progress(min(100, pct["p1_ov"]))
+        st.write(f"💥 **Burst Finish (2 pt):** `{pct['p1_bu']}%`")
+        st.progress(min(100, pct["p1_bu"]))
+        st.write(f"🔄 **Spin Finish (1 pt):** `{pct['p1_sp']}%`")
+        st.progress(min(100, pct["p1_sp"]))
+
+    with oc2:
+        st.markdown(f"#### 🔴 Esiti Vittoria: {nome2} ({prob2}%)")
+        st.write(f"⚡ **Xtreme Finish (3 pt):** `{pct['p2_xt']}%`")
+        st.progress(min(100, pct["p2_xt"]))
+        st.write(f"🚀 **Over Finish (2 pt):** `{pct['p2_ov']}%`")
+        st.progress(min(100, pct["p2_ov"]))
+        st.write(f"💥 **Burst Finish (2 pt):** `{pct['p2_bu']}%`")
+        st.progress(min(100, pct["p2_bu"]))
+        st.write(f"🔄 **Spin Finish (1 pt):** `{pct['p2_sp']}%`")
+        st.progress(min(100, pct["p2_sp"]))
+
+    st.divider()
     col_pred, col_rad_1v1 = st.columns([1.3, 1])
-    col_pred.success(f"Pronostico Arena: Favorito {'Blader 1' if prob1 >= prob2 else 'Blader 2'} ({win_n}) — Esito più probabile: {cond_win}.")
+    outcomes_labels = {
+        "p1_xt": f"🔵 Xtreme Finish di {nome1} (3 pt)",
+        "p1_ov": f"🔵 Over Finish di {nome1} (2 pt)",
+        "p1_bu": f"🔵 Burst Finish di {nome1} (2 pt)",
+        "p1_sp": f"🔵 Spin Finish di {nome1} (1 pt)",
+        "p2_xt": f"🔴 Xtreme Finish di {nome2} (3 pt)",
+        "p2_ov": f"🔴 Over Finish di {nome2} (2 pt)",
+        "p2_bu": f"🔴 Burst Finish di {nome2} (2 pt)",
+        "p2_sp": f"🔴 Spin Finish di {nome2} (1 pt)",
+    }
+    top_outcome = max(pct, key=pct.get)
+    col_pred.success(f"🏆 **Esito Singolo Più Probabile:** {outcomes_labels[top_outcome]} (**{pct[top_outcome]}%**)")
+    col_pred.info(
+        f"**Analisi Tattica:**\n"
+        f"- **🔵 {nome1}** ({w1}g, {h1}mm, *{sh1}*) punta a chiudere per **{max([('Xtreme', pct['p1_xt']), ('Over', pct['p1_ov']), ('Burst', pct['p1_bu']), ('Spin', pct['p1_sp'])], key=lambda x: x[1])[0]} Finish**.\n"
+        f"- **🔴 {nome2}** ({w2}g, {h2}mm, *{sh2}*) punta a chiudere per **{max([('Xtreme', pct['p2_xt']), ('Over', pct['p2_ov']), ('Burst', pct['p2_bu']), ('Spin', pct['p2_sp'])], key=lambda x: x[1])[0]} Finish**."
+    )
     col_pred.caption("🔵 **Area Blu** = Blader 1 | 🔴 **Area Rossa** = Blader 2")
     col_rad_1v1.markdown(radar_1v1_svg(st1, st2), unsafe_allow_html=True)
 
