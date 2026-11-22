@@ -7,8 +7,19 @@ import streamlit as st
 st.set_page_config(page_title="Beyblade X Pro Meta System", page_icon="⚡", layout="wide")
 
 # Inserisci qui l'URL "Raw" del tuo meta_live.json su GitHub
-LIVE_META_URL = "https://raw.githubusercontent.com/TUO_UTENTE/beyblade-analyzer/main/meta_live.json"
-
+LIVE_META_URL = "{
+  "versione": "2026.11 (WBO & GSI Live Meta)",
+  "extra_bx_blades": [],
+  "extra_ux_blades": [],
+  "extra_ratchets": [],
+  "extra_bits": [],
+  "meta_blades": {
+    "Wizard Rod": [25, "S+", "OWD imbattibile e forma circolare: riferimento assoluto per Stamina."],
+    "Phoenix Wing": [23, "S+", "Massa d'urto e aerodinamica al vertice competitivo."],
+    "Aero Pegasus": [23, "S+", "Compatto, denso e bilanciatissimo negli Xtreme Dash."],
+    "Cobalt Dragoon": [22, "S+", "Left-Spin dominante in Spin-Equalization e LAD."]
+  }
+}
 DB_PATH = "beyblade_bx_db.json"
 if not os.path.exists(DB_PATH):
     st.error(f"File database '{DB_PATH}' non trovato! Assicurati che sia nella stessa cartella di app.py.")
