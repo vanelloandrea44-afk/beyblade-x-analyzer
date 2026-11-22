@@ -221,17 +221,14 @@ BLADE_SHAPES = {
 }
 
 
-def get_blade_shape(n: str):
-    n_norm = normalize_name(n)
-    for k, v in BLADE_SHAPES.items():
-        if normalize_name(k) in n_norm:
-            return v
-    return ("Profilo Standard", 5, 5, 5, "Geometria bilanciata standard.")
-
-
 # FIX: Riconoscimento intelligente dei nomi CamelCase del DB (es. "WizardRod" -> "Wizard Rod")
 def normalize_name(s: str) -> str:
     return "".join(ch.lower() for ch in s if ch.isalnum())
+
+
+def has_blade(n: str, targets: list) -> bool:
+    n_norm = normalize_name(n)
+    return any(normalize_name(t) in n_norm for t in targets)
 
 
 def get_blade_meta(n: str):
@@ -242,18 +239,18 @@ def get_blade_meta(n: str):
     return (11, "B", "Blade standard senza vantaggi competitivi particolari.")
 
 
-def get_blade_shape(n: str, b_type: str):
+def get_blade_shape(n: str, b_type: str = "Balance"):
     n_norm = normalize_name(n)
     for k, v in BLADE_SHAPES.items():
         if normalize_name(k) in n_norm:
             return v
     defaults = {
-        "Attack": ("Lame Angolate Attack", 2, 0, 0, "Profilo spigoloso orientato all'impatto offensivo."),
-        "Defense": ("Scudo Perimetrale", 0, 2, 0, "Bordo chiuso progettato per deviare i colpi."),
-        "Stamina": ("Profilo Circolare", 0, 0, 2, "Geometria regolare per preservare la rotazione."),
-        "Balance": ("Profilo Ibrido", 1, 1, 1, "Geometria mista tra spinta e stabilità.")
+        "Attack": ("Lame Angolate Attack", 7, 3, 4, "Profilo spigoloso orientato all'impatto offensivo."),
+        "Defense": ("Scudo Perimetrale", 3, 8, 6, "Bordo chiuso progettato per deviare i colpi."),
+        "Stamina": ("Profilo Circolare", 2, 5, 8, "Geometria regolare per preservare la rotazione."),
+        "Balance": ("Profilo Ibrido", 5, 5, 5, "Geometria mista tra spinta e stabilità.")
     }
-    return defaults.get(b_type, ("Standard", 0, 0, 0, "Geometria bilanciata standard."))
+    return defaults.get(b_type, ("Standard", 5, 5, 5, "Geometria bilanciata standard."))
 
 
 def get_bit_meta(n: str):
@@ -266,7 +263,7 @@ def get_ratchet_meta(n: str):
 
 def calc_stats(b_name, b_type, bit_name, bit_type, w, burst_res, risk, h=6.0):
     bm_pts = get_blade_meta(b_name)[0]
-    shape_name, sh_att, sh_sta, sh_def, _ = get_blade_shape(b_name)
+    shape_name, sh_att, sh_def, sh_sta, _ = get_blade_shape(b_name, b_type)
     bonus_tier = 2 if bm_pts >= 20 else (1 if bm_pts >= 16 else 0)
 
     # Bonus altezza per forme Upper (es. Shark Edge/Scale su assetti bassi <= 6.0mm)
@@ -300,7 +297,7 @@ def valuta(blade, ratchet, bit):
     bm = get_blade_meta(blade["name"])
     bitm = get_bit_meta(bit["name"])
     rm = (12, "S+", "") if is_int else get_ratchet_meta(ratchet["name"])
-    shape_name, sh_att, sh_sta, sh_def, shape_desc = get_blade_shape(blade["name"])
+    shape_name, sh_att, sh_def, sh_sta, shape_desc = get_blade_shape(blade["name"], blade["type"])
 
     synergy_bonus = 0
     pros = [
@@ -404,8 +401,8 @@ def valuta_cx(lk, mb, ov, ab, r, bit, is_6):
 # MOTORE OUTCOME CALCULATOR 1VS1 (Xtreme / Over / Burst / Spin Finish)
 # ==============================================================================
 def calcola_outcomes_1v1(nome1, sc1, w1, h1, st1, tp1, nome2, sc2, w2, h2, st2, tp2):
-    sh1, sh_att1, sh_sta1, sh_def1, _ = get_blade_shape(nome1)
-    sh2, sh_att2, sh_sta2, sh_def2, _ = get_blade_shape(nome2)
+    sh1, sh_att1, sh_def1, sh_sta1, _ = get_blade_shape(nome1, tp1)
+    sh2, sh_att2, sh_def2, sh_sta2, _ = get_blade_shape(nome2, tp2)
 
     # 1. XTREME FINISH (3 pt) - Guidato da Attacco, Peso, Forma Smash/Upper e Velocità
     xt1 = max(2.0, (st1["Attacco"] ** 1.45) * 1.4 + (w1 - w2) * 1.6 + (sh_att1 * 1.1) - (st2["Difesa"] * 1.2) - (st2["Peso"] * 0.9))
@@ -449,6 +446,68 @@ def calcola_outcomes_1v1(nome1, sc1, w1, h1, st1, tp1, nome2, sc2, w2, h2, st2, 
     ev2 = round((pct["p2_xt"] * 3 + pct["p2_ov"] * 2 + pct["p2_bu"] * 2 + pct["p2_sp"] * 1) / 100.0, 2)
 
     return pct, prob1, prob2, ev1, ev2, (sh1, sh2)
+
+
+# ==============================================================================
+# GRAFICO RADAR SOVRAPPPOSTO 1VS1 (SVG)
+# ==============================================================================
+def radar_1v1_svg(st1, st2):
+    labels = ["Attacco", "Difesa", "Stamina", "Peso", "Anti-Burst"]
+    cx, cy, max_r = 160, 150, 95
+    n = len(labels)
+
+    def poly_points(stats_dict):
+        pts = []
+        for idx, k in enumerate(labels):
+            val = max(1, min(10, stats_dict.get(k, 5)))
+            r = (val / 10.0) * max_r
+            angle = -math.pi / 2 + (2 * math.pi * idx / n)
+            x = cx + r * math.cos(angle)
+            y = cy + r * math.sin(angle)
+            pts.append(f"{x:.1f},{y:.1f}")
+        return " ".join(pts)
+
+    grid_polys = []
+    for level in [2, 4, 6, 8, 10]:
+        r = (level / 10.0) * max_r
+        g_pts = []
+        for idx in range(n):
+            angle = -math.pi / 2 + (2 * math.pi * idx / n)
+            g_pts.append(f"{cx + r * math.cos(angle):.1f},{cy + r * math.sin(angle):.1f}")
+        grid_polys.append(f'<polygon points="{" ".join(g_pts)}" fill="none" stroke="#475569" stroke-width="0.8" stroke-dasharray="2,2"/>')
+
+    axes_svg = []
+    text_svg = []
+    for idx, k in enumerate(labels):
+        angle = -math.pi / 2 + (2 * math.pi * idx / n)
+        ex = cx + max_r * math.cos(angle)
+        ey = cy + max_r * math.sin(angle)
+        axes_svg.append(f'<line x1="{cx}" y1="{cy}" x2="{ex:.1f}" y2="{ey:.1f}" stroke="#475569" stroke-width="0.9"/>')
+
+        lx = cx + (max_r + 24) * math.cos(angle)
+        ly = cy + (max_r + 18) * math.sin(angle)
+        v1 = st1.get(k, 5)
+        v2 = st2.get(k, 5)
+        text_svg.append(
+            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" fill="#e2e8f0">'
+            f'{k} (<tspan fill="#38bdf8">{v1}</tspan>/<tspan fill="#f87171">{v2}</tspan>)</text>'
+        )
+
+    p1_poly = poly_points(st1)
+    p2_poly = poly_points(st2)
+
+    svg = f"""
+    <div style="display:flex;justify-content:center;align-items:center;">
+      <svg viewBox="0 0 320 300" width="100%" style="max-width:340px;background:#0f172a;border-radius:12px;padding:6px;">
+        {"".join(grid_polys)}
+        {"".join(axes_svg)}
+        <polygon points="{p1_poly}" fill="rgba(56, 189, 248, 0.28)" stroke="#38bdf8" stroke-width="2.2"/>
+        <polygon points="{p2_poly}" fill="rgba(248, 113, 113, 0.28)" stroke="#f87171" stroke-width="2.2"/>
+        {"".join(text_svg)}
+      </svg>
+    </div>
+    """
+    return svg
 
 
 # ==============================================================================
@@ -522,6 +581,105 @@ def selettore_bey(cont, pref, lin, usa_col):
     elif lin == "5. UX Infinity":
         return selettore_ux_inf(cont, pref, usa_col)
     return selettore_cx(cont, pref, lin == "6. CX Infinity (6 Pezzi)", usa_col)
+
+
+def radar_singolo_svg(stats_dict):
+    labels = ["Attacco", "Difesa", "Stamina", "Peso", "Anti-Burst"]
+    cx, cy, max_r = 160, 150, 95
+    n = len(labels)
+
+    pts = []
+    for idx, k in enumerate(labels):
+        val = max(1, min(10, stats_dict.get(k, 5)))
+        r = (val / 10.0) * max_r
+        angle = -math.pi / 2 + (2 * math.pi * idx / n)
+        x = cx + r * math.cos(angle)
+        y = cy + r * math.sin(angle)
+        pts.append(f"{x:.1f},{y:.1f}")
+
+    grid_polys = []
+    for level in [2, 4, 6, 8, 10]:
+        r = (level / 10.0) * max_r
+        g_pts = []
+        for idx in range(n):
+            angle = -math.pi / 2 + (2 * math.pi * idx / n)
+            g_pts.append(f"{cx + r * math.cos(angle):.1f},{cy + r * math.sin(angle):.1f}")
+        grid_polys.append(f'<polygon points="{" ".join(g_pts)}" fill="none" stroke="#475569" stroke-width="0.8" stroke-dasharray="2,2"/>')
+
+    axes_svg = []
+    text_svg = []
+    for idx, k in enumerate(labels):
+        angle = -math.pi / 2 + (2 * math.pi * idx / n)
+        ex = cx + max_r * math.cos(angle)
+        ey = cy + max_r * math.sin(angle)
+        axes_svg.append(f'<line x1="{cx}" y1="{cy}" x2="{ex:.1f}" y2="{ey:.1f}" stroke="#475569" stroke-width="0.9"/>')
+
+        lx = cx + (max_r + 24) * math.cos(angle)
+        ly = cy + (max_r + 18) * math.sin(angle)
+        val = stats_dict.get(k, 5)
+        text_svg.append(
+            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" fill="#e2e8f0">'
+            f'{k} (<tspan fill="#38bdf8">{val}</tspan>)</text>'
+        )
+
+    return f"""
+    <div style="display:flex;justify-content:center;align-items:center;">
+      <svg viewBox="0 0 320 300" width="100%" style="max-width:340px;background:#0f172a;border-radius:12px;padding:6px;">
+        {"".join(grid_polys)}
+        {"".join(axes_svg)}
+        <polygon points="{" ".join(pts)}" fill="rgba(56, 189, 248, 0.30)" stroke="#38bdf8" stroke-width="2.2"/>
+        {"".join(text_svg)}
+      </svg>
+    </div>
+    """
+
+
+# ==============================================================================
+# TAB 1: ANALIZZATORE COMBO & RADAR
+# ==============================================================================
+with t1:
+    st.subheader("🔍 Analizzatore Combo, Fisica & Radar Statistiche")
+    usa_col_1 = st.checkbox("Usa solo i pezzi della Mia Collezione", value=False, key="usa_col_t1")
+    lin_1 = st.radio(
+        "Seleziona Linea:",
+        ["1. BX", "2. UX", "3. CX (5 Pezzi)", "4. BX Infinity", "5. UX Infinity", "6. CX Infinity (6 Pezzi)"],
+        horizontal=True,
+        key="lin_t1"
+    )
+
+    c_sel, c_res = st.columns([1.2, 1.3])
+    with c_sel:
+        st.markdown("### 🛠️ Assembla la tua Combo")
+        nome_c, voto_c, peso_c, alt_c, pros_c, cons_c, stats_c, pezzi_c, tipo_c = selettore_bey(c_sel, "t1", lin_1, usa_col_1)
+
+    with c_res:
+        st.markdown("### 📊 Valutazione & Radar")
+        m1, m2, m3 = st.columns(3)
+        m1.metric("Voto Meta", f"{voto_c} / 100")
+        m2.metric("Peso Totale", f"{peso_c} g")
+        m3.metric("Altezza Stimata", f"{alt_c} mm")
+
+        st.progress(max(0, min(100, voto_c)))
+        st.markdown(radar_singolo_svg(stats_c), unsafe_allow_html=True)
+
+        if pros_c:
+            st.success("✅ **Punti di Forza & Sinergie:**\n- " + "\n- ".join(pros_c))
+        if cons_c:
+            st.warning("⚠️ **Avvertenze & Rischi:**\n- " + "\n- ".join(cons_c))
+
+        if st.button("➕ Aggiungi questa Combo al Deck Torneo", key="btn_add_deck_t1"):
+            if len(st.session_state.deck) >= 3:
+                st.error("Hai già 3 Beyblade nel Deck! Rimuovine uno nella scheda 'Deck Torneo' per aggiungerne un altro.")
+            else:
+                st.session_state.deck.append({
+                    "nome": nome_c,
+                    "voto": voto_c,
+                    "peso": peso_c,
+                    "pezzi": pezzi_c,
+                    "tipo": tipo_c
+                })
+                st.success(f"✅ Aggiunta **{nome_c}** al Deck Torneo!")
+                st.rerun()
 
 
 # ==============================================================================
