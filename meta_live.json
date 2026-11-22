@@ -1,0 +1,13 @@
+{
+  "versione": "2026.11 (WBO & GSI Live Meta)",
+  "extra_bx_blades": [],
+  "extra_ux_blades": [],
+  "extra_ratchets": [],
+  "extra_bits": [],
+  "meta_blades": {
+    "Wizard Rod": [25, "S+", "OWD imbattibile e forma circolare: riferimento assoluto per Stamina."],
+    "Phoenix Wing": [23, "S+", "Massa d'urto e aerodinamica al vertice competitivo."],
+    "Aero Pegasus": [23, "S+", "Compatto, denso e bilanciatissimo negli Xtreme Dash."],
+    "Cobalt Dragoon": [22, "S+", "Left-Spin dominante in Spin-Equalization e LAD."]
+  }
+}
