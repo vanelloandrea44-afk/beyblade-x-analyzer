@@ -7,19 +7,8 @@ import streamlit as st
 st.set_page_config(page_title="Beyblade X Pro Meta System", page_icon="⚡", layout="wide")
 
 # Inserisci qui l'URL "Raw" del tuo meta_live.json su GitHub
-LIVE_META_URL = "{
-  "versione": "2026.11 (WBO & GSI Live Meta)",
-  "extra_bx_blades": [],
-  "extra_ux_blades": [],
-  "extra_ratchets": [],
-  "extra_bits": [],
-  "meta_blades": {
-    "Wizard Rod": [25, "S+", "OWD imbattibile e forma circolare: riferimento assoluto per Stamina."],
-    "Phoenix Wing": [23, "S+", "Massa d'urto e aerodinamica al vertice competitivo."],
-    "Aero Pegasus": [23, "S+", "Compatto, denso e bilanciatissimo negli Xtreme Dash."],
-    "Cobalt Dragoon": [22, "S+", "Left-Spin dominante in Spin-Equalization e LAD."]
-  }
-}
+LIVE_META_URL = "https://raw.githubusercontent.com/TUO_UTENTE/beyblade-analyzer/main/meta_live.json"
+
 DB_PATH = "beyblade_bx_db.json"
 if not os.path.exists(DB_PATH):
     st.error(f"File database '{DB_PATH}' non trovato! Assicurati che sia nella stessa cartella di app.py.")
@@ -224,6 +213,33 @@ def radar_svg(stats: dict) -> str:
         f'<svg width="290" height="260" viewBox="0 0 290 260">'
         f'<polygon points="{outer_pts}" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>'
         f'<polygon points="{inner_pts}" fill="rgba(56, 189, 248, 0.45)" stroke="#38bdf8" stroke-width="2.5"/>'
+        f'{texts}</svg>'
+    )
+
+
+def radar_1v1_svg(stats1: dict, stats2: dict) -> str:
+    labels = ["Attacco", "Difesa", "Stamina", "Peso", "Anti-Burst"]
+    outer_pts = " ".join([
+        f"{160 + 90 * math.cos(math.radians(-90 + i * 72)):.1f},{140 + 90 * math.sin(math.radians(-90 + i * 72)):.1f}"
+        for i in range(5)
+    ])
+    pts1 = " ".join([
+        f"{160 + (90 * max(1, min(10, stats1[l])) / 10.0) * math.cos(math.radians(-90 + i * 72)):.1f},{140 + (90 * max(1, min(10, stats1[l])) / 10.0) * math.sin(math.radians(-90 + i * 72)):.1f}"
+        for i, l in enumerate(labels)
+    ])
+    pts2 = " ".join([
+        f"{160 + (90 * max(1, min(10, stats2[l])) / 10.0) * math.cos(math.radians(-90 + i * 72)):.1f},{140 + (90 * max(1, min(10, stats2[l])) / 10.0) * math.sin(math.radians(-90 + i * 72)):.1f}"
+        for i, l in enumerate(labels)
+    ])
+    texts = "".join([
+        f'<text x="{160 + 118 * math.cos(math.radians(-90 + i * 72)):.1f}" y="{140 + 110 * math.sin(math.radians(-90 + i * 72)):.1f}" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">{l} ({stats1[l]} vs {stats2[l]})</text>'
+        for i, l in enumerate(labels)
+    ])
+    return (
+        f'<svg width="340" height="285" viewBox="0 0 340 285">'
+        f'<polygon points="{outer_pts}" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>'
+        f'<polygon points="{pts1}" fill="rgba(56, 189, 248, 0.38)" stroke="#38bdf8" stroke-width="2.5"/>'
+        f'<polygon points="{pts2}" fill="rgba(248, 113, 113, 0.38)" stroke="#f87171" stroke-width="2.5"/>'
         f'{texts}</svg>'
     )
 
@@ -487,7 +503,10 @@ with t2:
     else:
         cond_win = "Spin Finish (1 pt) per controllo del centro"
 
-    st.success(f"Pronostico Arena: Favorito {'Blader 1' if prob1 >= prob2 else 'Blader 2'} ({win_n}) — Esito più probabile: {cond_win}.")
+    col_pred, col_rad_1v1 = st.columns([1.3, 1])
+    col_pred.success(f"Pronostico Arena: Favorito {'Blader 1' if prob1 >= prob2 else 'Blader 2'} ({win_n}) — Esito più probabile: {cond_win}.")
+    col_pred.caption("🔵 **Area Blu** = Blader 1 | 🔴 **Area Rossa** = Blader 2")
+    col_rad_1v1.markdown(radar_1v1_svg(st1, st2), unsafe_allow_html=True)
 
 # ==============================================================================
 # TAB 3: SUGGERITORE TOP 5 COMBO
