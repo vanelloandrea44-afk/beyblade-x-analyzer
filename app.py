@@ -261,6 +261,16 @@ def get_ratchet_meta(n: str):
     return META_RATCHETS.get(n, (7, "B", "Ratchet standard."))
 
 
+def is_left_spin_name(n: str) -> bool:
+    """Riconosce in modo affidabile le Blade Left-Spin (es. Cobalt Dragoon, Meteor Dragoon, Dragoon)."""
+    return has_blade(n, ["Cobalt Dragoon", "Meteor Dragoon", "Dragoon"])
+
+
+def has_spin_equalizer_bit(n: str) -> bool:
+    """Riconosce i Bit che massimizzano il LAD e il trasferimento di rotazione (Spin-Equalization)."""
+    return any(tag in n for tag in ["Elevate (E)", "Level (L)", "Glide (G)", "Free Ball (FB)"])
+
+
 def calc_stats(b_name, b_type, bit_name, bit_type, w, burst_res, risk, h=6.0):
     bm_pts = get_blade_meta(b_name)[0]
     shape_name, sh_att, sh_def, sh_sta, _ = get_blade_shape(b_name, b_type)
@@ -404,27 +414,114 @@ def calcola_outcomes_1v1(nome1, sc1, w1, h1, st1, tp1, nome2, sc2, w2, h2, st2, 
     sh1, sh_att1, sh_def1, sh_sta1, _ = get_blade_shape(nome1, tp1)
     sh2, sh_att2, sh_def2, sh_sta2, _ = get_blade_shape(nome2, tp2)
 
-    # 1. XTREME FINISH (3 pt) - Guidato da Attacco, Peso, Forma Smash/Upper e Velocità
-    xt1 = max(2.0, (st1["Attacco"] ** 1.45) * 1.4 + (w1 - w2) * 1.6 + (sh_att1 * 1.1) - (st2["Difesa"] * 1.2) - (st2["Peso"] * 0.9))
-    xt2 = max(2.0, (st2["Attacco"] ** 1.45) * 1.4 + (w2 - w1) * 1.6 + (sh_att2 * 1.1) - (st1["Difesa"] * 1.2) - (st1["Peso"] * 0.9))
+    ls1 = is_left_spin_name(nome1)
+    ls2 = is_left_spin_name(nome2)
+    eq1 = has_spin_equalizer_bit(nome1)
+    eq2 = has_spin_equalizer_bit(nome2)
 
-    # 2. OVER FINISH (2 pt) - Spinta fuori dalle tasche laterali (Peso + Attacco + Altezza)
-    ov1 = max(3.0, (st1["Attacco"] * 2.1) + (w1 - w2) * 2.1 + (h2 - h1) * 1.8 - (st2["Difesa"] * 1.1))
-    ov2 = max(3.0, (st2["Attacco"] * 2.1) + (w2 - w1) * 2.1 + (h1 - h2) * 1.8 - (st1["Difesa"] * 1.1))
+    # Differenze fisiche chiave nel duello
+    dw = w1 - w2          # >0 significa Blader 1 più pesante
+    dh = h1 - h2          # <0 significa Blader 1 più basso (colpisce verso l'alto / sotto il Ratchet)
+    h_diff_abs = abs(dh)
 
-    # 3. BURST FINISH (2 pt) - Attacco + Vantaggio Altezza (colpire sotto) vs Anti-Burst avversario
-    upper_adv1 = 10.0 if ("Upper" in sh1 and h1 < h2) else max(0.0, (h2 - h1) * 3.5)
-    upper_adv2 = 10.0 if ("Upper" in sh2 and h2 < h1) else max(0.0, (h1 - h2) * 3.5)
-    bu1 = max(1.5, (st1["Attacco"] * 1.8) + upper_adv1 + ((10 - st2["Anti-Burst"]) ** 1.55) * 1.9 - (st2["Anti-Burst"] * 0.8))
-    bu2 = max(1.5, (st2["Attacco"] * 1.8) + upper_adv2 + ((10 - st1["Anti-Burst"]) ** 1.55) * 1.9 - (st1["Anti-Burst"] * 0.8))
+    # 1. XTREME FINISH (3 pt) - Velocità Xtreme Dash, Attacco, Forma Smash/Upper e Inerzia
+    # Penalizzato se l'avversario ha altissimo Anti-Burst o forma molto pesante/stabile
+    xt1 = (
+        (st1["Attacco"] ** 1.45) * 1.45
+        + dw * 1.75
+        + (sh_att1 * 1.15)
+        - (st2["Difesa"] * 1.15)
+        - (st2["Peso"] * 0.95)
+        - max(0.0, h_diff_abs - 1.5) * 0.6
+    )
+    xt2 = (
+        (st2["Attacco"] ** 1.45) * 1.45
+        - dw * 1.75
+        + (sh_att2 * 1.15)
+        - (st1["Difesa"] * 1.15)
+        - (st1["Peso"] * 0.95)
+        - max(0.0, h_diff_abs - 1.5) * 0.6
+    )
+    xt1 = max(2.0, xt1)
+    xt2 = max(2.0, xt2)
 
-    # 4. SPIN FINISH (1 pt) - Stamina, Forma OWD, Spin-Equalization (Left-Spin)
-    ls1 = 16.0 if ("Dragoon" in nome1 and "Dragoon" not in nome2 and ("Elevate" in nome1 or "Level" in nome1)) else 0.0
-    ls2 = 16.0 if ("Dragoon" in nome2 and "Dragoon" not in nome1 and ("Elevate" in nome2 or "Level" in nome2)) else 0.0
-    sp1 = max(3.0, (st1["Stamina"] ** 1.5) * 1.8 + (sh_sta1 * 1.3) + ls1 - (st2["Stamina"] * 1.1))
-    sp2 = max(3.0, (st2["Stamina"] ** 1.5) * 1.8 + (sh_sta2 * 1.3) + ls2 - (st1["Stamina"] * 1.1))
+    # 2. OVER FINISH (2 pt) - Spinta laterale fuori dall'arena (Massa, Angolo d'impatto, Altezza)
+    # Un assetto più basso (-dh > 0 per p1) tende a spingere/sollevare l'avversario verso il bordo
+    ov1 = (
+        st1["Attacco"] * 2.15
+        + dw * 2.25
+        + (-dh) * 2.1
+        + (sh_att1 * 0.6)
+        - st2["Difesa"] * 1.2
+        - st2["Peso"] * 0.7
+    )
+    ov2 = (
+        st2["Attacco"] * 2.15
+        - dw * 2.25
+        + dh * 2.1
+        + (sh_att2 * 0.6)
+        - st1["Difesa"] * 1.2
+        - st1["Peso"] * 0.7
+    )
+    ov1 = max(2.5, ov1)
+    ov2 = max(2.5, ov2)
 
-    # Correzione in base al Voto Meta complessivo
+    # 3. BURST FINISH (2 pt) - Pressione d'urto + Attacco sotto il Ratchet vs Anti-Burst avversario
+    upper_adv1 = (11.5 if "Upper" in sh1 else 5.5) if dh < -0.3 else (2.5 if "Upper" in sh1 else 0.0)
+    upper_adv2 = (11.5 if "Upper" in sh2 else 5.5) if dh > 0.3 else (2.5 if "Upper" in sh2 else 0.0)
+    bu1 = (
+        st1["Attacco"] * 1.85
+        + upper_adv1
+        + max(0.0, dw) * 0.8
+        + ((10 - st2["Anti-Burst"]) ** 1.6) * 2.0
+        - st2["Anti-Burst"] * 0.85
+    )
+    bu2 = (
+        st2["Attacco"] * 1.85
+        + upper_adv2
+        + max(0.0, -dw) * 0.8
+        + ((10 - st1["Anti-Burst"]) ** 1.6) * 2.0
+        - st1["Anti-Burst"] * 0.85
+    )
+    bu1 = max(1.2, bu1)
+    bu2 = max(1.2, bu2)
+
+    # 4. SPIN FINISH (1 pt) - Stamina, Geometria OWD, LAD e Spin-Equalization (Left vs Right)
+    # In uno scontro Left-Spin vs Right-Spin, gli urti opposti dissipano energia ma una punta
+    # Spin-Equalizer (es. Elevate/Level/Glide) riduce la perdita e aiuta a reggere il finale
+    spin_eq_bonus1 = 0.0
+    spin_eq_bonus2 = 0.0
+    if ls1 and not ls2:
+        spin_eq_bonus1 = (13.0 if eq1 else 4.0) - (3.5 if st2["Stamina"] >= 9 else 0.0)
+        spin_eq_bonus2 = 2.0 if st2["Stamina"] >= 9 else -2.0
+    elif ls2 and not ls1:
+        spin_eq_bonus2 = (13.0 if eq2 else 4.0) - (3.5 if st1["Stamina"] >= 9 else 0.0)
+        spin_eq_bonus1 = 2.0 if st1["Stamina"] >= 9 else -2.0
+
+    # Penalità per assetti molto alti/instabili sul lungo periodo
+    stab_pen1 = max(0.0, h1 - 6.5) * 1.2
+    stab_pen2 = max(0.0, h2 - 6.5) * 1.2
+
+    sp1 = (
+        (st1["Stamina"] ** 1.55) * 1.85
+        + sh_sta1 * 1.35
+        + st1["Difesa"] * 0.55
+        + spin_eq_bonus1
+        - stab_pen1
+        - st2["Stamina"] * 1.15
+    )
+    sp2 = (
+        (st2["Stamina"] ** 1.55) * 1.85
+        + sh_sta2 * 1.35
+        + st2["Difesa"] * 0.55
+        + spin_eq_bonus2
+        - stab_pen2
+        - st1["Stamina"] * 1.15
+    )
+    sp1 = max(2.5, sp1)
+    sp2 = max(2.5, sp2)
+
+    # Fattore complessivo di qualità/consistenza della combo (Voto Meta)
     f1 = 0.85 + (sc1 / 250.0)
     f2 = 0.85 + (sc2 / 250.0)
 
